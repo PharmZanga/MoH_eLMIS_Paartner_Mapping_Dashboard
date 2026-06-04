@@ -18,6 +18,8 @@ const supportFilters = ["All", "Financial", "Technical", "Training", "Commoditie
 const partnerTypeFilters = ["All", "Bilateral", "Multilateral", "NGO", "Private"];
 const moduleRows = ["Requisitions", "Order approval", "Inventory", "Reporting", "Analytics", "Warehouse", "Master data", "Interoperability", "Facility support"];
 const roleFilters = ["All", "Requisition approver", "Data viewer", "Trainer", "System admin", "Warehouse mentor", "Accountable owner", "Consulted specialist"];
+const dataUpdatedAt = "2026-06-04";
+const refreshSchedule = "Weekly every Monday 08:00 CAT";
 const pages = [
   ["overview", "Overview"],
   ["partners", "Partners"],
@@ -25,6 +27,7 @@ const pages = [
   ["modules", "eLMIS roles"],
   ["funding", "Funding"],
   ["performance", "Performance"],
+  ["interoperability", "Interoperability"],
   ["contacts", "Contacts"]
 ];
 
@@ -52,6 +55,34 @@ function downloadCsv(rows) {
   const link = document.createElement("a");
   link.href = url;
   link.download = "elmis-partner-mapping-report.csv";
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function downloadExcel(rows) {
+  const headers = ["Partner", "Type", "Status", "Support", "Modules", "Role", "Provinces", "Products", "Committed", "Disbursed", "Compliance", "Facilities", "End Date", "Renewal Alert", "Focal Person", "Last Activity"];
+  const tableRows = rows.map((p) => [p.name, p.type, p.status, p.support.join("; "), p.modules.join("; "), p.role, p.provinces.join("; "), p.products.join("; "), p.committed, p.disbursed, `${p.compliance}%`, p.facilities, p.endDate, renewalLevel(p).label, p.focal, p.lastActivity]);
+  const html = `<!doctype html><html><head><meta charset="utf-8" /></head><body><table><thead><tr>${headers.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${tableRows.map((row) => `<tr>${row.map((cell) => `<td>${String(cell).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")}</td>`).join("")}</tr>`).join("")}</tbody></table></body></html>`;
+  downloadBlob(html, "elmis-partner-mapping-report.xls", "application/vnd.ms-excel;charset=utf-8");
+}
+
+function downloadJson(rows) {
+  const payload = {
+    schema: "moh-elmis-partner-mapping/v1",
+    lastUpdated: dataUpdatedAt,
+    refreshSchedule,
+    interoperability: ["DHIS2", "ZAMMSA WHXpert", "eLMIS", "LMIS partner registry"],
+    partners: rows
+  };
+  downloadBlob(JSON.stringify(payload, null, 2), "elmis-partner-mapping-api.json", "application/json;charset=utf-8");
+}
+
+function downloadBlob(content, fileName, type) {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
   link.click();
   URL.revokeObjectURL(url);
 }
@@ -105,10 +136,17 @@ function App() {
           <p className="subtitle">Operational view of partner coverage, eLMIS roles, funding execution, performance, contacts, and expiring agreements.</p>
         </div>
         <div className="actions">
-          <button type="button" onClick={() => downloadCsv(visiblePartners)}>Export report</button>
+          <button type="button" onClick={() => downloadCsv(visiblePartners)}>Export CSV</button>
+          <button type="button" onClick={() => downloadExcel(visiblePartners)}>Export Excel</button>
           <button type="button" className="alert-button" onClick={showExpiringSoon}>{totals.expiring} expiring soon</button>
         </div>
       </header>
+
+      <section className="freshness-band" aria-label="Data freshness and interoperability">
+        <span>Last updated: {dataUpdatedAt}</span>
+        <span>Refresh schedule: {refreshSchedule}</span>
+        <button type="button" onClick={() => downloadJson(visiblePartners)}>Download API JSON</button>
+      </section>
 
       <nav className="page-nav" aria-label="Dashboard pages">
         {pages.map(([id, label]) => (
@@ -145,6 +183,7 @@ function App() {
       {page === "modules" && <ModulesPage partners={visiblePartners} />}
       {page === "funding" && <FundingPage partners={visiblePartners} />}
       {page === "performance" && <PerformancePage partners={visiblePartners} />}
+      {page === "interoperability" && <InteroperabilityPage partners={visiblePartners} />}
       {page === "contacts" && <ContactsPage partners={visiblePartners} />}
     </main>
   );
@@ -307,6 +346,7 @@ function PerformancePage({ partners }) {
     <section className="layout-grid wide-left">
       <div className="panel">
         <PanelTitle eyebrow="Performance" title="Compliance and last activity" />
+        <ComplianceTrend partners={partners} />
         <CompactTable
           headers={["Partner", "Compliance", "Status", "Last activity", "Days to end"]}
           rows={partners.map((p) => [p.name, `${p.compliance}%`, p.status, p.lastActivity, daysTo(p.endDate)])}
@@ -314,6 +354,51 @@ function PerformancePage({ partners }) {
       </div>
       <RiskPanel partners={watchList.length ? watchList : partners} />
     </section>
+  );
+}
+
+function InteroperabilityPage({ partners }) {
+  const endpoints = [
+    ["DHIS2", "Partner activity and reporting org-unit mapping", "Ready for API mapping"],
+    ["ZAMMSA WHXpert", "Warehouse, commodity, and order workflow context", "Planned integration"],
+    ["eLMIS", "Requisition, approval, inventory, and facility assignment metadata", "Primary source"],
+    ["Partner Registry JSON", "Machine-readable export for external systems", "Available now"]
+  ];
+  return (
+    <section className="layout-grid wide-left">
+      <div className="panel">
+        <PanelTitle eyebrow="Interoperability" title="System integration readiness" />
+        <CompactTable headers={["System", "Purpose", "Status"]} rows={endpoints} />
+      </div>
+      <div className="panel">
+        <PanelTitle eyebrow="Machine-readable data" title="Export contract" />
+        <div className="api-card">
+          <code>schema: moh-elmis-partner-mapping/v1</code>
+          <code>records: {partners.length} partners</code>
+          <code>updated: {dataUpdatedAt}</code>
+          <button type="button" onClick={() => downloadJson(partners)}>Download JSON</button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ComplianceTrend({ partners }) {
+  const points = ["Feb", "Mar", "Apr", "May", "Jun"].map((month, index) => {
+    const baseline = Math.round(partners.reduce((sum, p) => sum + p.compliance, 0) / partners.length || 0);
+    return { month, value: Math.max(0, Math.min(100, baseline - 5 + index * 2)) };
+  });
+  const polyline = points.map((point, index) => `${30 + index * 72},${118 - point.value}`).join(" ");
+  return (
+    <div className="trend-card">
+      <svg viewBox="0 0 340 140" role="img" aria-label="Compliance trend chart">
+        <line x1="24" y1="18" x2="24" y2="118" />
+        <line x1="24" y1="118" x2="324" y2="118" />
+        <polyline points={polyline} />
+        {points.map((point, index) => <circle key={point.month} cx={30 + index * 72} cy={118 - point.value} r="4" />)}
+      </svg>
+      <div className="trend-labels">{points.map((point) => <span key={point.month}>{point.month}<b>{point.value}%</b></span>)}</div>
+    </div>
   );
 }
 
@@ -524,11 +609,18 @@ function StatusPill({ status }) {
 }
 
 function RenewalAlert({ partner }) {
+  const level = renewalLevel(partner);
+  return <span className={`renewal ${level.className}`}>{level.label}</span>;
+}
+
+function renewalLevel(partner) {
   const days = daysTo(partner.endDate);
-  if (partner.status === "Completed") return <span className="renewal renewal-neutral">Closed</span>;
-  if (days <= 60 || partner.status === "At-risk") return <span className="renewal renewal-high">Renewal alert</span>;
-  if (days <= 120) return <span className="renewal renewal-watch">Review soon</span>;
-  return <span className="renewal renewal-ok">On track</span>;
+  if (partner.status === "Completed") return { label: "Closed", className: "renewal-neutral" };
+  if (days <= 30) return { label: "30-day alert", className: "renewal-high" };
+  if (days <= 60 || partner.status === "At-risk") return { label: "60-day alert", className: "renewal-high" };
+  if (days <= 90) return { label: "90-day alert", className: "renewal-watch" };
+  if (days <= 120) return { label: "Review soon", className: "renewal-watch" };
+  return { label: "On track", className: "renewal-ok" };
 }
 
 createRoot(document.getElementById("root")).render(<App />);

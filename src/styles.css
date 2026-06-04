@@ -136,6 +136,41 @@ h2 {
   border-color: #193f32;
 }
 
+.freshness-band {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border: 1px solid #d9e2dd;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #40554c;
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
+.freshness-band span {
+  min-height: 26px;
+  display: inline-flex;
+  align-items: center;
+  border-right: 1px solid #d1ddd7;
+  padding-right: 10px;
+}
+
+.freshness-band button,
+.api-card button {
+  border: 1px solid #b9cbc3;
+  border-radius: 7px;
+  background: #f8fbf9;
+  color: #17392d;
+  min-height: 30px;
+  padding: 0 10px;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
 .filter-band {
   display: grid;
   grid-template-columns: minmax(240px, 1.2fr) repeat(4, minmax(140px, 0.7fr));
@@ -364,6 +399,70 @@ td span {
 
 .legend-row strong {
   color: #10251d;
+}
+
+.trend-card {
+  border: 1px solid #dce5e0;
+  border-radius: 8px;
+  background: #f8faf9;
+  padding: 12px;
+  margin-bottom: 14px;
+}
+
+.trend-card svg {
+  width: 100%;
+  height: 160px;
+}
+
+.trend-card line {
+  stroke: #b9c8c1;
+  stroke-width: 2;
+}
+
+.trend-card polyline {
+  fill: none;
+  stroke: #256f52;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.trend-card circle {
+  fill: #d19a25;
+  stroke: #ffffff;
+  stroke-width: 2;
+}
+
+.trend-labels {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  color: #53675f;
+  font-size: 0.74rem;
+  text-align: center;
+}
+
+.trend-labels b {
+  display: block;
+  color: #17392d;
+  font-size: 0.84rem;
+  margin-top: 2px;
+}
+
+.api-card {
+  display: grid;
+  gap: 10px;
+}
+
+.api-card code {
+  display: block;
+  border: 1px solid #dce5e0;
+  border-radius: 7px;
+  background: #f6faf8;
+  color: #1c4335;
+  padding: 10px;
+  font-size: 0.82rem;
+  white-space: normal;
 }
 
 .funding-label {
