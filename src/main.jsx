@@ -15,7 +15,9 @@ const partners = [
 
 const provinces = ["Central", "Copperbelt", "Eastern", "Luapula", "Lusaka", "Muchinga", "Northern", "North-Western", "Southern", "Western"];
 const supportFilters = ["All", "Financial", "Technical", "Training", "Commodities", "Infrastructure", "Governance", "Analytics"];
+const partnerTypeFilters = ["All", "Bilateral", "Multilateral", "NGO", "Private"];
 const moduleRows = ["Requisitions", "Order approval", "Inventory", "Reporting", "Analytics", "Warehouse", "Master data", "Interoperability", "Facility support"];
+const roleFilters = ["All", "Requisition approver", "Data viewer", "Trainer", "System admin", "Warehouse mentor", "Accountable owner", "Consulted specialist"];
 const pages = [
   ["overview", "Overview"],
   ["partners", "Partners"],
@@ -58,16 +60,22 @@ function App() {
   const [page, setPage] = useState("overview");
   const [supportFilter, setSupportFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [typeFilter, setTypeFilter] = useState("All");
+  const [provinceFilter, setProvinceFilter] = useState("All");
+  const [roleFilter, setRoleFilter] = useState("All");
   const [query, setQuery] = useState("");
 
   const visiblePartners = useMemo(() => {
     return partners.filter((partner) => {
       const matchesSupport = supportFilter === "All" || partner.support.includes(supportFilter);
       const matchesStatus = statusFilter === "All" || partner.status === statusFilter;
+      const matchesType = typeFilter === "All" || partner.type === typeFilter;
+      const matchesProvince = provinceFilter === "All" || partner.provinces.includes(provinceFilter) || partner.provinces.includes("National");
+      const matchesRole = roleFilter === "All" || partner.role === roleFilter;
       const haystack = [partner.name, partner.type, partner.role, partner.focal, partner.contact, ...partner.modules, ...partner.provinces, ...partner.products].join(" ").toLowerCase();
-      return matchesSupport && matchesStatus && haystack.includes(query.toLowerCase());
+      return matchesSupport && matchesStatus && matchesType && matchesProvince && matchesRole && haystack.includes(query.toLowerCase());
     });
-  }, [supportFilter, statusFilter, query]);
+  }, [supportFilter, statusFilter, typeFilter, provinceFilter, roleFilter, query]);
 
   const totals = useMemo(() => {
     const committed = visiblePartners.reduce((sum, p) => sum + p.committed, 0);
@@ -81,6 +89,9 @@ function App() {
   function showExpiringSoon() {
     setStatusFilter("All");
     setSupportFilter("All");
+    setTypeFilter("All");
+    setProvinceFilter("All");
+    setRoleFilter("All");
     setQuery("");
     setPage("performance");
   }
@@ -110,6 +121,12 @@ function App() {
         setQuery={setQuery}
         statusFilter={statusFilter}
         setStatusFilter={setStatusFilter}
+        typeFilter={typeFilter}
+        setTypeFilter={setTypeFilter}
+        provinceFilter={provinceFilter}
+        setProvinceFilter={setProvinceFilter}
+        roleFilter={roleFilter}
+        setRoleFilter={setRoleFilter}
         supportFilter={supportFilter}
         setSupportFilter={setSupportFilter}
       />
@@ -117,8 +134,9 @@ function App() {
       <section className="kpi-grid" aria-label="Summary KPIs">
         <Kpi label="Mapped partners" value={visiblePartners.length} detail={`${visiblePartners.filter((p) => p.status === "Active").length} active`} />
         <Kpi label="Committed funding" value={money(totals.committed)} detail={`${money(totals.disbursed)} disbursed`} />
+        <Kpi label="Funding disbursed" value={`${Math.round((totals.disbursed / totals.committed) * 100 || 0)}%`} detail="Execution rate" />
         <Kpi label="Facilities assigned" value={totals.facilities.toLocaleString()} detail="Excludes national-only support" />
-        <Kpi label="Average compliance" value={`${totals.compliance}%`} detail="Deliverables and reporting" />
+        <Kpi label="Partners at-risk" value={visiblePartners.filter((p) => p.status === "At-risk" || p.compliance < 80 || daysTo(p.endDate) <= 120).length} detail={`${totals.compliance}% avg compliance`} />
       </section>
 
       {page === "overview" && <Overview partners={visiblePartners} />}
@@ -132,7 +150,7 @@ function App() {
   );
 }
 
-function Filters({ query, setQuery, statusFilter, setStatusFilter, supportFilter, setSupportFilter }) {
+function Filters({ query, setQuery, statusFilter, setStatusFilter, typeFilter, setTypeFilter, provinceFilter, setProvinceFilter, roleFilter, setRoleFilter, supportFilter, setSupportFilter }) {
   return (
     <section className="filter-band" aria-label="Dashboard filters">
       <label>
@@ -143,6 +161,24 @@ function Filters({ query, setQuery, statusFilter, setStatusFilter, supportFilter
         <span>Status</span>
         <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
           {["All", "Active", "Planned", "At-risk", "Completed"].map((status) => <option key={status}>{status}</option>)}
+        </select>
+      </label>
+      <label>
+        <span>Partner type</span>
+        <select value={typeFilter} onChange={(event) => setTypeFilter(event.target.value)}>
+          {partnerTypeFilters.map((type) => <option key={type}>{type}</option>)}
+        </select>
+      </label>
+      <label>
+        <span>Province</span>
+        <select value={provinceFilter} onChange={(event) => setProvinceFilter(event.target.value)}>
+          {["All", "National", ...provinces].map((province) => <option key={province}>{province}</option>)}
+        </select>
+      </label>
+      <label>
+        <span>eLMIS role</span>
+        <select value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)}>
+          {roleFilters.map((role) => <option key={role}>{role}</option>)}
         </select>
       </label>
       <div className="segmented" role="group" aria-label="Support type">
@@ -161,7 +197,7 @@ function Overview({ partners }) {
     <>
       <section className="layout-grid">
         <MapPanel partners={partners} />
-        <FundingBars partners={partners.slice(0, 6)} />
+        <SupportBreakdown partners={partners} />
       </section>
       <section className="layout-grid wide-left">
         <ModuleMatrix partners={partners} />
@@ -169,6 +205,40 @@ function Overview({ partners }) {
       </section>
       <DirectoryTable partners={partners} title="Partner directory" />
     </>
+  );
+}
+
+function SupportBreakdown({ partners }) {
+  const rows = supportFilters
+    .filter((item) => item !== "All")
+    .map((support) => ({ support, count: partners.filter((p) => p.support.includes(support)).length }))
+    .filter((item) => item.count > 0);
+  const total = rows.reduce((sum, item) => sum + item.count, 0) || 1;
+  const colors = ["#256F52", "#7A9F35", "#D19A25", "#4D7EA8", "#8A5C9E", "#C05B46", "#5A776E"];
+  const gradient = rows.reduce((parts, item, index) => {
+    const previous = rows.slice(0, index).reduce((sum, row) => sum + row.count, 0);
+    const start = (previous / total) * 100;
+    const end = ((previous + item.count) / total) * 100;
+    return [...parts, `${colors[index % colors.length]} ${start}% ${end}%`];
+  }, []).join(", ");
+  return (
+    <div className="panel">
+      <PanelTitle eyebrow="Support mix" title="Support type breakdown" />
+      <div className="donut-layout">
+        <div className="donut" style={{ background: `conic-gradient(${gradient})` }}>
+          <span>{total}</span>
+        </div>
+        <div className="legend-list">
+          {rows.map((item, index) => (
+            <div className="legend-row" key={item.support}>
+              <i style={{ background: colors[index % colors.length] }} />
+              <span>{item.support}</span>
+              <strong>{Math.round((item.count / total) * 100)}%</strong>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -343,13 +413,53 @@ function RiskPanel({ partners }) {
 }
 
 function DirectoryTable({ partners, title }) {
+  const [sort, setSort] = useState({ key: "name", direction: "asc" });
+  const sortedPartners = useMemo(() => {
+    const copy = [...partners];
+    copy.sort((a, b) => {
+      const sorters = {
+        name: [a.name, b.name],
+        type: [a.type, b.type],
+        funding: [a.disbursed, b.disbursed],
+        status: [a.status, b.status],
+        endDate: [daysTo(a.endDate), daysTo(b.endDate)],
+        compliance: [a.compliance, b.compliance]
+      };
+      const [left, right] = sorters[sort.key] || sorters.name;
+      const result = typeof left === "number" ? left - right : String(left).localeCompare(String(right));
+      return sort.direction === "asc" ? result : -result;
+    });
+    return copy;
+  }, [partners, sort]);
+
+  function changeSort(key) {
+    setSort((current) => ({
+      key,
+      direction: current.key === key && current.direction === "asc" ? "desc" : "asc"
+    }));
+  }
+
   return (
     <section className="panel directory-panel">
       <PanelTitle eyebrow="Partner directory" title={title} />
       <div className="table-wrap">
         <table>
-          <thead><tr><th>Partner</th><th>Type</th><th>Support</th><th>eLMIS role</th><th>Coverage</th><th>Funding</th><th>Status</th><th>End date</th><th>Focal person</th></tr></thead>
-          <tbody>{partners.map((p) => (
+          <thead>
+            <tr>
+              <SortableTh label="Partner" sortKey="name" sort={sort} onSort={changeSort} />
+              <SortableTh label="Type" sortKey="type" sort={sort} onSort={changeSort} />
+              <th>Support</th>
+              <th>eLMIS role</th>
+              <th>Coverage</th>
+              <SortableTh label="Funding" sortKey="funding" sort={sort} onSort={changeSort} />
+              <SortableTh label="Status" sortKey="status" sort={sort} onSort={changeSort} />
+              <SortableTh label="End date" sortKey="endDate" sort={sort} onSort={changeSort} />
+              <SortableTh label="Compliance" sortKey="compliance" sort={sort} onSort={changeSort} />
+              <th>Renewal alert</th>
+              <th>Focal person</th>
+            </tr>
+          </thead>
+          <tbody>{sortedPartners.map((p) => (
             <tr key={p.name}>
               <td><strong>{p.name}</strong><span>{p.products.join(", ")}</span></td>
               <td>{p.type}</td>
@@ -359,12 +469,25 @@ function DirectoryTable({ partners, title }) {
               <td>{money(p.disbursed)}<span>of {money(p.committed)}</span></td>
               <td><StatusPill status={p.status} /></td>
               <td>{p.endDate}<span>{daysTo(p.endDate)} days</span></td>
+              <td>{p.compliance}%</td>
+              <td><RenewalAlert partner={p} /></td>
               <td>{p.focal}<span>Last activity {p.lastActivity}</span></td>
             </tr>
           ))}</tbody>
         </table>
       </div>
     </section>
+  );
+}
+
+function SortableTh({ label, sortKey, sort, onSort }) {
+  const marker = sort.key === sortKey ? (sort.direction === "asc" ? "up" : "down") : "";
+  return (
+    <th>
+      <button type="button" className="sort-button" onClick={() => onSort(sortKey)}>
+        {label}<span>{marker}</span>
+      </button>
+    </th>
   );
 }
 
@@ -397,7 +520,15 @@ function Kpi({ label, value, detail }) {
 }
 
 function StatusPill({ status }) {
-  return <span className={`status status-${status.toLowerCase().replace("-", "")}`}>{status}</span>;
+  return <span className={`status status-${status.toLowerCase().replace("-", "")}`}><i />{status}</span>;
+}
+
+function RenewalAlert({ partner }) {
+  const days = daysTo(partner.endDate);
+  if (partner.status === "Completed") return <span className="renewal renewal-neutral">Closed</span>;
+  if (days <= 60 || partner.status === "At-risk") return <span className="renewal renewal-high">Renewal alert</span>;
+  if (days <= 120) return <span className="renewal renewal-watch">Review soon</span>;
+  return <span className="renewal renewal-ok">On track</span>;
 }
 
 createRoot(document.getElementById("root")).render(<App />);
