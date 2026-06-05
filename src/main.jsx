@@ -18,10 +18,12 @@ const supportFilters = ["All", "Financial", "Technical", "Training", "Commoditie
 const partnerTypeFilters = ["All", "Bilateral", "Multilateral", "NGO", "Private"];
 const moduleRows = ["Requisitions", "Order approval", "Inventory", "Reporting", "Analytics", "Warehouse", "Master data", "Interoperability", "Facility support"];
 const roleFilters = ["All", "Requisition approver", "Data viewer", "Trainer", "System admin", "Warehouse mentor", "Accountable owner", "Consulted specialist"];
-const dataUpdatedAt = "2026-06-04";
+const dataUpdatedAt = "2026-06-05";
 const refreshSchedule = "Weekly every Monday 08:00 CAT";
+const dataSources = ["Partner reports", "DHIS2 org units", "ZAMMSA WHXpert", "eLMIS requisition metadata", "MoH grant records"];
 const pages = [
   ["overview", "Overview"],
+  ["roadmap", "Roadmap"],
   ["partners", "Partners"],
   ["mapping", "Mapping"],
   ["modules", "eLMIS roles"],
@@ -36,7 +38,7 @@ function money(value) {
 }
 
 function daysTo(dateString) {
-  const today = new Date("2026-06-04T00:00:00");
+  const today = new Date("2026-06-05T00:00:00");
   const end = new Date(`${dateString}T00:00:00`);
   return Math.ceil((end - today) / 86400000);
 }
@@ -145,6 +147,7 @@ function App() {
       <section className="freshness-band" aria-label="Data freshness and interoperability">
         <span>Last updated: {dataUpdatedAt}</span>
         <span>Refresh schedule: {refreshSchedule}</span>
+        <span>Sources: {dataSources.slice(0, 3).join(", ")}</span>
         <button type="button" onClick={() => downloadJson(visiblePartners)}>Download API JSON</button>
       </section>
 
@@ -177,9 +180,10 @@ function App() {
         <Kpi label="Partners at-risk" value={visiblePartners.filter((p) => p.status === "At-risk" || p.compliance < 80 || daysTo(p.endDate) <= 120).length} detail={`${totals.compliance}% avg compliance`} />
       </section>
 
-      {page === "overview" && <Overview partners={visiblePartners} />}
+      {page === "overview" && <Overview partners={visiblePartners} setProvinceFilter={setProvinceFilter} />}
+      {page === "roadmap" && <RoadmapPage />}
       {page === "partners" && <PartnersPage partners={visiblePartners} />}
-      {page === "mapping" && <MappingPage partners={visiblePartners} />}
+      {page === "mapping" && <MappingPage partners={visiblePartners} setProvinceFilter={setProvinceFilter} />}
       {page === "modules" && <ModulesPage partners={visiblePartners} />}
       {page === "funding" && <FundingPage partners={visiblePartners} />}
       {page === "performance" && <PerformancePage partners={visiblePartners} />}
@@ -231,11 +235,11 @@ function Filters({ query, setQuery, statusFilter, setStatusFilter, typeFilter, s
   );
 }
 
-function Overview({ partners }) {
+function Overview({ partners, setProvinceFilter }) {
   return (
     <>
       <section className="layout-grid">
-        <MapPanel partners={partners} />
+        <MapPanel partners={partners} setProvinceFilter={setProvinceFilter} />
         <SupportBreakdown partners={partners} />
       </section>
       <section className="layout-grid wide-left">
@@ -244,6 +248,31 @@ function Overview({ partners }) {
       </section>
       <DirectoryTable partners={partners} title="Partner directory" />
     </>
+  );
+}
+
+function RoadmapPage() {
+  const rows = [
+    ["Strategic KPIs", "Implemented", "Automated totals for active partners, funding, disbursement rate, facilities, and risk count."],
+    ["Data Visualization", "Implemented", "Province density map, support mix donut, funding bars, and compliance trend chart."],
+    ["User Interaction", "Implemented", "Linked search and filters for status, province, partner type, support type, and eLMIS role."],
+    ["Data Reliability", "Implemented", "Data as-of date, refresh schedule, and source system strip are visible above filters."],
+    ["System Interoperability", "In progress", "JSON export contract is available; DHIS2, WHXpert, eLMIS, and partner M&E API hooks are documented."],
+    ["Advanced Analytics", "Implemented", "Compliance trend and automated alert flags classify partners as On Track, Needs Attention, or At Risk."]
+  ];
+  return (
+    <section className="layout-grid wide-left">
+      <div className="panel">
+        <PanelTitle eyebrow="Upgrade roadmap" title="Implementation status" />
+        <CompactTable headers={["Improvement area", "Status", "Dashboard response"]} rows={rows} />
+      </div>
+      <div className="panel">
+        <PanelTitle eyebrow="Data sources" title="Current and planned source systems" />
+        <div className="source-grid">
+          {dataSources.map((source) => <span key={source}>{source}</span>)}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -294,10 +323,10 @@ function PartnersPage({ partners }) {
   );
 }
 
-function MappingPage({ partners }) {
+function MappingPage({ partners, setProvinceFilter }) {
   return (
     <section className="layout-grid wide-left">
-      <MapPanel partners={partners} />
+      <MapPanel partners={partners} setProvinceFilter={setProvinceFilter} />
       <div className="panel">
         <PanelTitle eyebrow="Province detail" title="Coverage by province" />
         <div className="stat-list">
@@ -348,8 +377,8 @@ function PerformancePage({ partners }) {
         <PanelTitle eyebrow="Performance" title="Compliance and last activity" />
         <ComplianceTrend partners={partners} />
         <CompactTable
-          headers={["Partner", "Compliance", "Status", "Last activity", "Days to end"]}
-          rows={partners.map((p) => [p.name, `${p.compliance}%`, p.status, p.lastActivity, daysTo(p.endDate)])}
+          headers={["Partner", "Compliance", "Alert flag", "Status", "Last activity", "Days to end"]}
+          rows={partners.map((p) => [p.name, `${p.compliance}%`, alertFlag(p).label, p.status, p.lastActivity, daysTo(p.endDate)])}
         />
       </div>
       <RiskPanel partners={watchList.length ? watchList : partners} />
@@ -376,6 +405,7 @@ function InteroperabilityPage({ partners }) {
           <code>schema: moh-elmis-partner-mapping/v1</code>
           <code>records: {partners.length} partners</code>
           <code>updated: {dataUpdatedAt}</code>
+          <code>sources: {dataSources.join(" | ")}</code>
           <button type="button" onClick={() => downloadJson(partners)}>Download JSON</button>
         </div>
       </div>
@@ -414,16 +444,16 @@ function ContactsPage({ partners }) {
   );
 }
 
-function MapPanel({ partners }) {
+function MapPanel({ partners, setProvinceFilter }) {
   return (
     <div className="panel map-panel">
-      <PanelTitle eyebrow="Geographic mapping" title="Partner density by province" aside="Partners covering province" />
-      <div className="province-map">
+      <PanelTitle eyebrow="Geographic mapping" title="Clickable Zambia province map" aside="Select a province to filter" />
+      <div className="province-map zambia-map">
         {provinceCoverage(partners).map(({ province, count }) => (
-          <div className={`province level-${Math.min(count, 5)}`} key={province}>
+          <button type="button" className={`province level-${Math.min(count, 5)} ${province.toLowerCase().replaceAll(" ", "-")}`} key={province} onClick={() => setProvinceFilter?.(province)}>
             <span>{province}</span>
             <strong>{count}</strong>
-          </div>
+          </button>
         ))}
       </div>
     </div>
@@ -611,6 +641,13 @@ function StatusPill({ status }) {
 function RenewalAlert({ partner }) {
   const level = renewalLevel(partner);
   return <span className={`renewal ${level.className}`}>{level.label}</span>;
+}
+
+function alertFlag(partner) {
+  const days = daysTo(partner.endDate);
+  if (partner.status === "At-risk" || partner.compliance < 80 || days <= 60) return { label: "At Risk", className: "alert-risk" };
+  if (partner.compliance < 88 || days <= 120) return { label: "Needs Attention", className: "alert-watch" };
+  return { label: "On Track", className: "alert-ok" };
 }
 
 function renewalLevel(partner) {

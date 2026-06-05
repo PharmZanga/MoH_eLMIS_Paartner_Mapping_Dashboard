@@ -297,6 +297,11 @@ td span {
   gap: 10px;
 }
 
+.zambia-map {
+  grid-template-columns: repeat(7, minmax(76px, 1fr));
+  align-items: stretch;
+}
+
 .province {
   min-height: 96px;
   border-radius: 8px;
@@ -306,6 +311,7 @@ td span {
   justify-content: space-between;
   border: 1px solid #cbd8d1;
   color: #12231b;
+  text-align: left;
 }
 
 .province span {
@@ -315,6 +321,50 @@ td span {
 
 .province strong {
   font-size: 1.8rem;
+}
+
+.province:hover {
+  outline: 3px solid rgba(25, 63, 50, 0.2);
+}
+
+.north-western {
+  grid-column: 1 / span 2;
+}
+
+.copperbelt {
+  grid-column: 3 / span 2;
+}
+
+.luapula {
+  grid-column: 5 / span 2;
+}
+
+.western {
+  grid-column: 1 / span 2;
+}
+
+.central {
+  grid-column: 3 / span 2;
+}
+
+.muchinga {
+  grid-column: 5 / span 2;
+}
+
+.lusaka {
+  grid-column: 2 / span 2;
+}
+
+.southern {
+  grid-column: 4 / span 2;
+}
+
+.eastern {
+  grid-column: 6 / span 2;
+}
+
+.northern {
+  grid-column: 4 / span 2;
 }
 
 .level-1 {
@@ -463,6 +513,25 @@ td span {
   padding: 10px;
   font-size: 0.82rem;
   white-space: normal;
+}
+
+.source-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.source-grid span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  border: 1px solid #d1ddd7;
+  border-radius: 999px;
+  background: #f8fbf9;
+  color: #1c4335;
+  padding: 0 12px;
+  font-size: 0.82rem;
+  font-weight: 800;
 }
 
 .funding-label {
@@ -814,6 +883,19 @@ td strong {
   .province-map,
   .module-matrix {
     grid-template-columns: 1fr;
+  }
+
+  .north-western,
+  .copperbelt,
+  .luapula,
+  .western,
+  .central,
+  .muchinga,
+  .lusaka,
+  .southern,
+  .eastern,
+  .northern {
+    grid-column: auto;
   }
 
   .module-matrix > div,
