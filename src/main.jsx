@@ -14,6 +14,18 @@ const partners = [
 ];
 
 const provinces = ["Central", "Copperbelt", "Eastern", "Luapula", "Lusaka", "Muchinga", "Northern", "North-Western", "Southern", "Western"];
+const provinceMarkerPositions = {
+  Central: { top: "48%", left: "52%" },
+  Copperbelt: { top: "34%", left: "45%" },
+  Eastern: { top: "53%", left: "72%" },
+  Luapula: { top: "26%", left: "59%" },
+  Lusaka: { top: "64%", left: "56%" },
+  Muchinga: { top: "32%", left: "68%" },
+  Northern: { top: "18%", left: "57%" },
+  "North-Western": { top: "30%", left: "28%" },
+  Southern: { top: "76%", left: "44%" },
+  Western: { top: "65%", left: "23%" }
+};
 const supportFilters = ["All", "Financial", "Technical", "Training", "Commodities", "Infrastructure", "Governance", "Analytics"];
 const partnerTypeFilters = ["All", "Bilateral", "Multilateral", "NGO", "Private"];
 const moduleRows = ["Requisitions", "Order approval", "Inventory", "Reporting", "Analytics", "Warehouse", "Master data", "Interoperability", "Facility support"];
@@ -447,10 +459,23 @@ function ContactsPage({ partners }) {
 function MapPanel({ partners, setProvinceFilter }) {
   return (
     <div className="panel map-panel">
-      <PanelTitle eyebrow="Geographic mapping" title="Clickable Zambia province map" aside="Select a province to filter" />
-      <div className="province-map zambia-map">
+      <PanelTitle eyebrow="Geographic mapping" title="Google map of Zambia partner coverage" aside="Select a marker to filter" />
+      <div className="google-map-shell">
+        <iframe
+          title="Google map of Zambia"
+          src="https://www.google.com/maps?q=Zambia&z=6&output=embed"
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+        />
         {provinceCoverage(partners).map(({ province, count }) => (
-          <button type="button" className={`province level-${Math.min(count, 5)} ${province.toLowerCase().replaceAll(" ", "-")}`} key={province} onClick={() => setProvinceFilter?.(province)}>
+          <button
+            type="button"
+            className={`map-marker level-${Math.min(count, 5)} ${province.toLowerCase().replaceAll(" ", "-")}`}
+            key={province}
+            style={provinceMarkerPositions[province]}
+            onClick={() => setProvinceFilter?.(province)}
+            title={`Filter to ${province}`}
+          >
             <span>{province}</span>
             <strong>{count}</strong>
           </button>
