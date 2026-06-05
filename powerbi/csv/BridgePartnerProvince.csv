@@ -1,0 +1,24 @@
+PartnerID,PartnerName,Province,IsNationalCoverage,AllocatedFacilities
+P001,USAID GHSC-PSM,Lusaka,false,116
+P001,USAID GHSC-PSM,Copperbelt,false,116
+P001,USAID GHSC-PSM,Southern,false,116
+P001,USAID GHSC-PSM,Eastern,false,116
+P002,Global Fund,Lusaka,false,97
+P002,Global Fund,Copperbelt,false,97
+P002,Global Fund,North-Western,false,97
+P002,Global Fund,Western,false,97
+P003,UNICEF,Luapula,false,69
+P003,UNICEF,Northern,false,69
+P003,UNICEF,Muchinga,false,69
+P003,UNICEF,Eastern,false,69
+P004,CHAI,Lusaka,false,65
+P004,CHAI,Central,false,65
+P004,CHAI,Southern,false,65
+P005,JICA,Lusaka,false,44
+P005,JICA,Copperbelt,false,44
+P006,World Bank,National,true,0
+P007,Crown Agents,Lusaka,false,21
+P007,Crown Agents,Central,false,21
+P008,PATH,Western,false,71
+P008,PATH,Southern,false,71
+P008,PATH,Eastern,false,71

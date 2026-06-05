@@ -1,0 +1,22 @@
+PartnerID,PartnerName,eLMISModule
+P001,USAID GHSC-PSM,Requisitions
+P001,USAID GHSC-PSM,Order approval
+P001,USAID GHSC-PSM,Analytics
+P002,Global Fund,Analytics
+P002,Global Fund,Reporting
+P002,Global Fund,Master data
+P003,UNICEF,Inventory
+P003,UNICEF,Reporting
+P003,UNICEF,Facility support
+P004,CHAI,Analytics
+P004,CHAI,Interoperability
+P004,CHAI,Dashboards
+P005,JICA,Warehouse
+P005,JICA,Order approval
+P005,JICA,Inventory
+P006,World Bank,Master data
+P006,World Bank,Reporting
+P007,Crown Agents,Warehouse
+P007,Crown Agents,Integration support
+P008,PATH,Facility support
+P008,PATH,Reporting

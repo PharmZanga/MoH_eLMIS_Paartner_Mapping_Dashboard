@@ -1,0 +1,13 @@
+MeasureName,DAX
+Total Partners,DISTINCTCOUNT(FactPartners[PartnerID])
+Active Partners,"CALCULATE([Total Partners], FactPartners[Status] = ""Active"")"
+At Risk Partners,"CALCULATE([Total Partners], FactPartners[AlertFlag] = ""At Risk"")"
+Committed Funding,SUM(FactFunding[CommittedUSD])
+Disbursed Funding,SUM(FactFunding[DisbursedUSD])
+Undisbursed Funding,SUM(FactFunding[UndisbursedUSD])
+Disbursement Rate,"DIVIDE([Disbursed Funding], [Committed Funding])"
+Facilities Covered,SUM(FactPartners[FacilitiesCovered])
+Allocated Facilities,SUM(BridgePartnerProvince[AllocatedFacilities])
+Average Compliance,AVERAGE(FactPerformance[ComplianceRate])
+Expiring Within 90 Days,"CALCULATE([Total Partners], FactPerformance[DaysToAgreementEnd] <= 90, FactPerformance[Status] <> ""Completed"")"
+Partners by Province,DISTINCTCOUNT(BridgePartnerProvince[PartnerID])

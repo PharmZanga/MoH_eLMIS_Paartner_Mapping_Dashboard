@@ -1,0 +1,19 @@
+PartnerID,PartnerName,SupportType
+P001,USAID GHSC-PSM,Financial
+P001,USAID GHSC-PSM,Technical
+P001,USAID GHSC-PSM,Training
+P002,Global Fund,Financial
+P002,Global Fund,Governance
+P003,UNICEF,Technical
+P003,UNICEF,Training
+P003,UNICEF,Commodities
+P004,CHAI,Technical
+P004,CHAI,Analytics
+P005,JICA,Infrastructure
+P005,JICA,Training
+P006,World Bank,Financial
+P006,World Bank,Governance
+P007,Crown Agents,Technical
+P007,Crown Agents,Infrastructure
+P008,PATH,Training
+P008,PATH,Analytics

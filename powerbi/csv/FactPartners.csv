@@ -1,0 +1,9 @@
+PartnerID,PartnerName,PartnerType,Status,eLMISRole,AgreementEndDate,LastActivityDate,FocalPerson,Email,Phone,ComplianceRate,FacilitiesCovered,RenewalAlert,AlertFlag
+P001,USAID GHSC-PSM,Bilateral,Active,Requisition approver,2026-09-30,2026-05-24,MoH LMU / USAID,moh-lmu@example.gov.zm,+260 000 000 001,0.91,462,Review soon,Needs Attention
+P002,Global Fund,Multilateral,Active,Data viewer,2027-03-31,2026-05-18,MoH Grants Unit,grants@example.gov.zm,+260 000 000 002,0.87,388,On track,Needs Attention
+P003,UNICEF,Multilateral,Active,Trainer,2026-12-15,2026-05-27,EPI Programme,epi@example.gov.zm,+260 000 000 003,0.94,274,On track,On Track
+P004,CHAI,NGO,Active,System admin,2026-08-20,2026-05-14,Digital Health Unit,digitalhealth@example.gov.zm,+260 000 000 004,0.82,195,90-day alert,Needs Attention
+P005,JICA,Bilateral,At-risk,Warehouse mentor,2026-07-31,2026-04-29,ZAMMSA Operations,operations@example.gov.zm,+260 000 000 005,0.73,88,60-day alert,At Risk
+P006,World Bank,Multilateral,Active,Accountable owner,2027-06-30,2026-05-21,MoH Planning,planning@example.gov.zm,+260 000 000 006,0.89,0,On track,On Track
+P007,Crown Agents,Private,Completed,Consulted specialist,2026-05-31,2026-05-30,ZAMMSA ICT,ict@example.gov.zm,+260 000 000 007,0.97,42,Closed,At Risk
+P008,PATH,NGO,Planned,Trainer,2027-01-15,2026-05-03,EPI Programme,epi-path@example.gov.zm,+260 000 000 008,0.78,214,On track,At Risk

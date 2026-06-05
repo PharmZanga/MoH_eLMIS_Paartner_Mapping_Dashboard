@@ -1,0 +1,19 @@
+PartnerID,PartnerName,ProductCategory
+P001,USAID GHSC-PSM,HIV
+P001,USAID GHSC-PSM,Malaria
+P001,USAID GHSC-PSM,Essential medicines
+P002,Global Fund,HIV
+P002,Global Fund,TB
+P002,Global Fund,Malaria
+P003,UNICEF,Vaccines
+P003,UNICEF,Nutrition
+P003,UNICEF,Child health
+P004,CHAI,HIV
+P004,CHAI,Maternal health
+P005,JICA,Essential medicines
+P005,JICA,Lab commodities
+P006,World Bank,All programmes
+P007,Crown Agents,Procurement
+P007,Crown Agents,Warehousing
+P008,PATH,Vaccines
+P008,PATH,Malaria

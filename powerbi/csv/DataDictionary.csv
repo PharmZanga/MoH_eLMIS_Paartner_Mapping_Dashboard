@@ -1,0 +1,10 @@
+Table,Description
+FactPartners,"One row per partner with current status, role, dates, contacts, compliance, and risk labels."
+FactFunding,Partner-level committed and disbursed funding in USD.
+FactPerformance,"Snapshot fact for compliance, agreement end risk, status, and alert classification."
+BridgePartnerProvince,Many-to-many bridge between partners and provinces. Use AllocatedFacilities to avoid double counting.
+BridgePartnerSupport,Many-to-many bridge between partners and support types.
+BridgePartnerModule,Many-to-many bridge between partners and eLMIS modules/functions.
+BridgePartnerProduct,Many-to-many bridge between partners and product/service categories.
+DimProvince,Province lookup with approximate capital coordinates for Power BI maps.
+DimDate,Calendar table for agreement and activity dates.
