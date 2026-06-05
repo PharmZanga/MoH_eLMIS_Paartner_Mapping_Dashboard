@@ -327,14 +327,14 @@ td span {
   position: absolute;
   z-index: 2;
   transform: translate(-50%, -50%);
-  min-width: 112px;
-  min-height: 70px;
+  width: 74px;
+  min-height: 46px;
   border: 1px solid rgba(28, 67, 53, 0.18);
-  border-radius: 8px;
-  padding: 10px 12px;
+  border-radius: 999px;
+  padding: 6px 8px;
   color: #12231b;
   text-align: left;
-  box-shadow: 0 12px 26px rgba(18, 37, 29, 0.16);
+  box-shadow: 0 10px 18px rgba(18, 37, 29, 0.18);
 }
 
 .map-marker span,
@@ -343,18 +343,22 @@ td span {
 }
 
 .map-marker span {
-  font-size: 0.82rem;
+  overflow: hidden;
+  font-size: 0.64rem;
   font-weight: 850;
+  line-height: 1.05;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .map-marker strong {
-  margin-top: 10px;
-  font-size: 1.7rem;
+  margin-top: 2px;
+  font-size: 1.12rem;
   line-height: 1;
 }
 
 .map-marker:hover {
-  outline: 3px solid rgba(25, 63, 50, 0.24);
+  outline: 2px solid rgba(25, 63, 50, 0.24);
 }
 
 .zambia-map {
@@ -950,9 +954,17 @@ td strong {
   }
 
   .map-marker {
-    min-width: 96px;
-    min-height: 62px;
-    padding: 8px 10px;
+    width: 66px;
+    min-height: 42px;
+    padding: 5px 7px;
+  }
+
+  .map-marker span {
+    font-size: 0.58rem;
+  }
+
+  .map-marker strong {
+    font-size: 1rem;
   }
 
   .north-western,

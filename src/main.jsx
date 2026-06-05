@@ -122,6 +122,17 @@ function App() {
     });
   }, [supportFilter, statusFilter, typeFilter, provinceFilter, roleFilter, query]);
 
+  const mapPartners = useMemo(() => {
+    return partners.filter((partner) => {
+      const matchesSupport = supportFilter === "All" || partner.support.includes(supportFilter);
+      const matchesStatus = statusFilter === "All" || partner.status === statusFilter;
+      const matchesType = typeFilter === "All" || partner.type === typeFilter;
+      const matchesRole = roleFilter === "All" || partner.role === roleFilter;
+      const haystack = [partner.name, partner.type, partner.role, partner.focal, partner.contact, ...partner.modules, ...partner.provinces, ...partner.products].join(" ").toLowerCase();
+      return matchesSupport && matchesStatus && matchesType && matchesRole && haystack.includes(query.toLowerCase());
+    });
+  }, [supportFilter, statusFilter, typeFilter, roleFilter, query]);
+
   const totals = useMemo(() => {
     const committed = visiblePartners.reduce((sum, p) => sum + p.committed, 0);
     const disbursed = visiblePartners.reduce((sum, p) => sum + p.disbursed, 0);
@@ -192,10 +203,10 @@ function App() {
         <Kpi label="Partners at-risk" value={visiblePartners.filter((p) => p.status === "At-risk" || p.compliance < 80 || daysTo(p.endDate) <= 120).length} detail={`${totals.compliance}% avg compliance`} />
       </section>
 
-      {page === "overview" && <Overview partners={visiblePartners} setProvinceFilter={setProvinceFilter} />}
+      {page === "overview" && <Overview partners={visiblePartners} mapPartners={mapPartners} setProvinceFilter={setProvinceFilter} />}
       {page === "roadmap" && <RoadmapPage />}
       {page === "partners" && <PartnersPage partners={visiblePartners} />}
-      {page === "mapping" && <MappingPage partners={visiblePartners} setProvinceFilter={setProvinceFilter} />}
+      {page === "mapping" && <MappingPage partners={visiblePartners} mapPartners={mapPartners} setProvinceFilter={setProvinceFilter} />}
       {page === "modules" && <ModulesPage partners={visiblePartners} />}
       {page === "funding" && <FundingPage partners={visiblePartners} />}
       {page === "performance" && <PerformancePage partners={visiblePartners} />}
@@ -247,11 +258,11 @@ function Filters({ query, setQuery, statusFilter, setStatusFilter, typeFilter, s
   );
 }
 
-function Overview({ partners, setProvinceFilter }) {
+function Overview({ partners, mapPartners, setProvinceFilter }) {
   return (
     <>
       <section className="layout-grid">
-        <MapPanel partners={partners} setProvinceFilter={setProvinceFilter} />
+        <MapPanel partners={mapPartners} setProvinceFilter={setProvinceFilter} />
         <SupportBreakdown partners={partners} />
       </section>
       <section className="layout-grid wide-left">
@@ -335,14 +346,14 @@ function PartnersPage({ partners }) {
   );
 }
 
-function MappingPage({ partners, setProvinceFilter }) {
+function MappingPage({ partners, mapPartners, setProvinceFilter }) {
   return (
     <section className="layout-grid wide-left">
-      <MapPanel partners={partners} setProvinceFilter={setProvinceFilter} />
+      <MapPanel partners={mapPartners} setProvinceFilter={setProvinceFilter} />
       <div className="panel">
         <PanelTitle eyebrow="Province detail" title="Coverage by province" />
         <div className="stat-list">
-          {provinceCoverage(partners).map(({ province, count, facilities }) => <StatRow key={province} label={province} value={`${count} partners`} detail={`${facilities} facilities`} />)}
+          {provinceCoverage(mapPartners).map(({ province, count, facilities }) => <StatRow key={province} label={province} value={`${count} partners`} detail={`${facilities} facilities`} />)}
         </div>
       </div>
     </section>
