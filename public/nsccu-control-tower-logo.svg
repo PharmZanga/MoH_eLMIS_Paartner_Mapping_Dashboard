@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-labelledby="title desc">
+  <title id="title">National Supply Chain Coordination Unit Control Tower</title>
+  <desc id="desc">A green control tower connected to supply chain nodes.</desc>
+  <circle cx="60" cy="60" r="56" fill="#f7faf8" stroke="#193f32" stroke-width="4"/>
+  <path d="M31 83h58" fill="none" stroke="#d19a25" stroke-width="5" stroke-linecap="round"/>
+  <path d="M48 82l6-39h12l6 39" fill="#dcebe4" stroke="#193f32" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M42 43h36l-6-13H48z" fill="#277856" stroke="#193f32" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M52 55h16M50 67h20" fill="none" stroke="#193f32" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="24" cy="42" r="7" fill="#c05b46"/>
+  <circle cx="96" cy="42" r="7" fill="#c05b46"/>
+  <circle cx="24" cy="84" r="7" fill="#7a9f35"/>
+  <circle cx="96" cy="84" r="7" fill="#7a9f35"/>
+  <path d="M31 42h11M78 42h11M31 81l12-7M77 74l12 7" fill="none" stroke="#4d7ea8" stroke-width="4" stroke-linecap="round"/>
+</svg>

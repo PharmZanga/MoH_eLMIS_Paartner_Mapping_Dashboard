@@ -155,7 +155,24 @@ function App() {
   return (
     <main className="dashboard-shell">
       <header className="topbar">
-        <div>
+        <div className="header-brand">
+          <div className="institutional-logos" aria-label="Ministry of Health and National Supply Chain Coordination Unit">
+            <div className="logo-lockup government-lockup">
+              <img src={`${import.meta.env.BASE_URL}zambia-coat-of-arms.png`} alt="Coat of arms of Zambia" />
+              <div>
+                <span>Republic of Zambia</span>
+                <strong>Ministry of Health</strong>
+              </div>
+            </div>
+            <span className="logo-divider" aria-hidden="true" />
+            <div className="logo-lockup control-tower-lockup">
+              <img src={`${import.meta.env.BASE_URL}nsccu-control-tower-logo.svg`} alt="NSCCU Control Tower mark" />
+              <div>
+                <span>Control Tower</span>
+                <strong>National Supply Chain Coordination Unit</strong>
+              </div>
+            </div>
+          </div>
           <p className="eyebrow">Ministry of Health Zambia</p>
           <h1>eLMIS Partner Mapping Dashboard</h1>
           <p className="subtitle">Operational view of partner coverage, eLMIS roles, funding execution, performance, contacts, and expiring agreements.</p>
