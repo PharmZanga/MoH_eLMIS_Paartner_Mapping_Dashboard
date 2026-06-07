@@ -13,6 +13,7 @@
 body {
   margin: 0;
   min-width: 320px;
+  overflow-x: clip;
   background:
     linear-gradient(180deg, rgba(238, 242, 239, 0.82), rgba(238, 242, 239, 0.96) 42%, #eef2ef 100%),
     url("/MoH_eLMIS_Paartner_Mapping_Dashboard/pharmaceutical-dashboard-bg.png") center top / cover fixed no-repeat;
@@ -43,6 +44,27 @@ button {
   padding: 28px;
 }
 
+.institutional-header {
+  width: calc(100% + 56px);
+  margin: -28px -28px 30px;
+  border-top: 4px solid #26302c;
+  border-bottom: 1px solid rgba(139, 190, 172, 0.2);
+  background:
+    linear-gradient(90deg, rgba(4, 43, 34, 0.99) 0%, rgba(4, 43, 34, 0.97) 55%, rgba(4, 43, 34, 0.82) 100%),
+    url("/MoH_eLMIS_Paartner_Mapping_Dashboard/pharmaceutical-dashboard-bg.png") right 37% / 520px auto no-repeat;
+  box-shadow: 0 10px 28px rgba(8, 38, 29, 0.18);
+}
+
+.institutional-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: min(1480px, 100%);
+  min-height: 116px;
+  margin: 0 auto;
+  padding: 10px 68px;
+}
+
 .topbar {
   display: flex;
   align-items: flex-start;
@@ -55,30 +77,26 @@ button {
   min-width: 0;
 }
 
-.institutional-logos {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  margin-bottom: 22px;
-}
-
 .logo-lockup {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  gap: 4px;
   min-width: 0;
+  text-align: center;
 }
 
 .logo-lockup img {
   flex: none;
-  width: 64px;
-  height: 72px;
+  width: 50px;
+  height: 58px;
   object-fit: contain;
 }
 
 .control-tower-lockup img {
-  width: 66px;
-  height: 66px;
+  width: 64px;
+  height: 50px;
 }
 
 .logo-lockup span,
@@ -87,29 +105,35 @@ button {
 }
 
 .logo-lockup span {
-  margin-bottom: 3px;
-  color: #5c7067;
-  font-size: 0.67rem;
+  margin-bottom: 2px;
+  color: #a9c7bc;
+  font-size: 0.58rem;
   font-weight: 850;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .logo-lockup strong {
-  max-width: 250px;
-  color: #10251d;
-  font-size: 0.88rem;
-  line-height: 1.25;
+  max-width: 230px;
+  color: #ffffff;
+  font-size: 0.78rem;
+  line-height: 1.15;
+  text-transform: uppercase;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .government-lockup strong {
-  font-size: 1rem;
+  font-size: 0.82rem;
+  text-transform: none;
 }
 
-.logo-divider {
-  width: 1px;
-  height: 54px;
-  background: #bdcbc4;
+.government-lockup {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.control-tower-lockup span {
+  color: #24d4de;
 }
 
 .eyebrow {
@@ -982,8 +1006,8 @@ td strong {
     display: grid;
   }
 
-  .institutional-logos {
-    flex-wrap: wrap;
+  .institutional-inner {
+    padding-inline: 38px;
   }
 
   .actions {
@@ -1008,37 +1032,40 @@ td strong {
     font-size: 2.25rem;
   }
 
-  .institutional-logos {
-    align-items: flex-start;
-    gap: 12px;
-    margin-bottom: 18px;
+  .institutional-header {
+    width: calc(100% + 36px);
+    margin-top: -18px;
+    margin-right: -18px;
+    margin-bottom: 22px;
+    margin-left: -18px;
   }
 
-  .logo-lockup {
-    width: 100%;
+  .institutional-inner {
+    min-height: 102px;
+    padding: 9px 18px;
   }
 
   .logo-lockup img {
-    width: 52px;
-    height: 58px;
+    width: 44px;
+    height: 50px;
   }
 
   .control-tower-lockup img {
     width: 54px;
-    height: 54px;
-  }
-
-  .logo-divider {
-    display: none;
+    height: 42px;
   }
 
   .logo-lockup strong {
-    max-width: none;
-    font-size: 0.82rem;
+    max-width: 160px;
+    font-size: 0.65rem;
   }
 
   .government-lockup strong {
-    font-size: 0.94rem;
+    font-size: 0.72rem;
+  }
+
+  .logo-lockup span {
+    font-size: 0.5rem;
   }
 
   .kpi-grid,

@@ -1,14 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-labelledby="title desc">
-  <title id="title">National Supply Chain Coordination Unit Control Tower</title>
-  <desc id="desc">A green control tower connected to supply chain nodes.</desc>
-  <circle cx="60" cy="60" r="56" fill="#f7faf8" stroke="#193f32" stroke-width="4"/>
-  <path d="M31 83h58" fill="none" stroke="#d19a25" stroke-width="5" stroke-linecap="round"/>
-  <path d="M48 82l6-39h12l6 39" fill="#dcebe4" stroke="#193f32" stroke-width="5" stroke-linejoin="round"/>
-  <path d="M42 43h36l-6-13H48z" fill="#277856" stroke="#193f32" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M52 55h16M50 67h20" fill="none" stroke="#193f32" stroke-width="4" stroke-linecap="round"/>
-  <circle cx="24" cy="42" r="7" fill="#c05b46"/>
-  <circle cx="96" cy="42" r="7" fill="#c05b46"/>
-  <circle cx="24" cy="84" r="7" fill="#7a9f35"/>
-  <circle cx="96" cy="84" r="7" fill="#7a9f35"/>
-  <path d="M31 42h11M78 42h11M31 81l12-7M77 74l12 7" fill="none" stroke="#4d7ea8" stroke-width="4" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 90" role="img" aria-labelledby="title desc">
+  <title id="title">Control Tower</title>
+  <desc id="desc">An angular cyan supply chain control tower monogram.</desc>
+  <g fill="none" stroke="#23d2dc" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M13 25L43 7l16 9-12 7-5-3-17 10v21l10 6V38l17-10 12 7-17 10v31L13 57z" stroke-width="8"/>
+    <path d="M62 31l17-10 28 16v30L79 83 62 73V48l13-8 10 6-11 7v13l6 4 14-8V44L79 35l-10 6z" stroke-width="8"/>
+    <path d="M46 76l14 8 15-9" stroke-width="6"/>
+  </g>
 </svg>
