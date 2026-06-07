@@ -1,5 +1,7 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import "./styles.css";
 
 const partners = [
@@ -14,18 +16,6 @@ const partners = [
 ];
 
 const provinces = ["Central", "Copperbelt", "Eastern", "Luapula", "Lusaka", "Muchinga", "Northern", "North-Western", "Southern", "Western"];
-const provinceMarkerPositions = {
-  Central: { top: "48%", left: "52%" },
-  Copperbelt: { top: "34%", left: "45%" },
-  Eastern: { top: "53%", left: "72%" },
-  Luapula: { top: "26%", left: "59%" },
-  Lusaka: { top: "64%", left: "56%" },
-  Muchinga: { top: "32%", left: "68%" },
-  Northern: { top: "18%", left: "57%" },
-  "North-Western": { top: "30%", left: "28%" },
-  Southern: { top: "76%", left: "44%" },
-  Western: { top: "65%", left: "23%" }
-};
 const supportFilters = ["All", "Financial", "Technical", "Training", "Commodities", "Infrastructure", "Governance", "Analytics"];
 const partnerTypeFilters = ["All", "Bilateral", "Multilateral", "NGO", "Private"];
 const moduleRows = ["Requisitions", "Order approval", "Inventory", "Reporting", "Analytics", "Warehouse", "Master data", "Interoperability", "Facility support"];
@@ -487,29 +477,109 @@ function ContactsPage({ partners }) {
 }
 
 function MapPanel({ partners, setProvinceFilter }) {
+  const mapElementRef = useRef(null);
+  const [mapStatus, setMapStatus] = useState("loading");
+  const coverage = useMemo(() => provinceCoverage(partners), [partners]);
+
+  useEffect(() => {
+    if (!mapElementRef.current) return undefined;
+
+    let cancelled = false;
+    const map = L.map(mapElementRef.current, {
+      center: [-13.4, 27.8],
+      zoom: 6,
+      minZoom: 5,
+      maxZoom: 10,
+      zoomControl: true,
+      attributionControl: true,
+    });
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: "&copy; OpenStreetMap contributors",
+    }).addTo(map);
+    map.attributionControl.addAttribution('Province boundaries: <a href="https://www.geoboundaries.org/" target="_blank" rel="noreferrer">geoBoundaries</a>');
+
+    const countByProvince = new Map(coverage.map((item) => [item.province, item]));
+    const boundaryUrl = `${import.meta.env.BASE_URL}zambia-provinces.geojson`;
+
+    fetch(boundaryUrl)
+      .then((response) => {
+        if (!response.ok) throw new Error(`Boundary request failed: ${response.status}`);
+        return response.json();
+      })
+      .then((geojson) => {
+        if (cancelled) return;
+
+        const boundaryLayer = L.geoJSON(geojson, {
+          style: (feature) => {
+            const count = countByProvince.get(feature.properties.shapeName)?.count ?? 0;
+            return {
+              color: "#176b52",
+              weight: 1.5,
+              opacity: 0.95,
+              fillColor: count >= 5 ? "#3f9476" : count >= 3 ? "#86be91" : count >= 1 ? "#cfe5c6" : "#edf3ea",
+              fillOpacity: 0.46,
+            };
+          },
+          onEachFeature: (feature, layer) => {
+            const province = feature.properties.shapeName;
+            const item = countByProvince.get(province) ?? { count: 0, facilities: 0 };
+            layer.bindTooltip(
+              `<strong>${province}</strong><br>${item.count} mapped partner${item.count === 1 ? "" : "s"}<br>${item.facilities.toLocaleString()} facilities`,
+              { sticky: true, className: "province-map-tooltip" },
+            );
+            layer.on({
+              click: () => setProvinceFilter?.(province),
+              mouseover: () => layer.setStyle({ weight: 2.5, fillOpacity: 0.62 }),
+              mouseout: () => boundaryLayer.resetStyle(layer),
+            });
+          },
+        }).addTo(map);
+
+        boundaryLayer.eachLayer((layer) => {
+          const province = layer.feature.properties.shapeName;
+          const item = countByProvince.get(province) ?? { count: 0 };
+          const markerIcon = L.divIcon({
+            className: "province-marker-host",
+            html: `<div class="province-count-marker level-${Math.min(item.count, 5)}"><span>${province}</span><strong>${item.count}</strong></div>`,
+            iconSize: [68, 42],
+            iconAnchor: [34, 21],
+          });
+          L.marker(layer.getBounds().getCenter(), {
+            icon: markerIcon,
+            keyboard: true,
+            title: `Filter to ${province}`,
+            riseOnHover: true,
+          })
+            .on("click", () => setProvinceFilter?.(province))
+            .addTo(map);
+        });
+
+        map.fitBounds(boundaryLayer.getBounds(), { padding: [18, 18] });
+        setMapStatus("ready");
+      })
+      .catch(() => {
+        if (!cancelled) setMapStatus("error");
+      });
+
+    const resizeObserver = new ResizeObserver(() => map.invalidateSize({ pan: false }));
+    resizeObserver.observe(mapElementRef.current);
+
+    return () => {
+      cancelled = true;
+      resizeObserver.disconnect();
+      map.remove();
+    };
+  }, [coverage, setProvinceFilter]);
+
   return (
     <div className="panel map-panel">
-      <PanelTitle eyebrow="Geographic mapping" title="Google map of Zambia partner coverage" aside="Select a marker to filter" />
+      <PanelTitle eyebrow="Geographic mapping" title="Zambia provincial partner coverage" aside="Drag, zoom, or select a province" />
       <div className="google-map-shell">
-        <iframe
-          title="Google map of Zambia"
-          src="https://www.google.com/maps?q=Zambia&z=6&output=embed"
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-        />
-        {provinceCoverage(partners).map(({ province, count }) => (
-          <button
-            type="button"
-            className={`map-marker level-${Math.min(count, 5)} ${province.toLowerCase().replaceAll(" ", "-")}`}
-            key={province}
-            style={provinceMarkerPositions[province]}
-            onClick={() => setProvinceFilter?.(province)}
-            title={`Filter to ${province}`}
-          >
-            <span>{province}</span>
-            <strong>{count}</strong>
-          </button>
-        ))}
+        <div ref={mapElementRef} className="interactive-province-map" aria-label="Interactive map of Zambia provinces and mapped partner counts" />
+        {mapStatus === "loading" && <div className="map-loading">Loading provincial boundaries...</div>}
+        {mapStatus === "error" && <div className="map-loading map-error">The provincial boundary layer could not be loaded.</div>}
       </div>
     </div>
   );

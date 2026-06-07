@@ -391,59 +391,90 @@ td span {
   background: #dfeae4;
 }
 
-.google-map-shell iframe {
-  position: absolute;
-  inset: 0;
+.interactive-province-map {
   width: 100%;
-  height: 100%;
-  border: 0;
-  filter: saturate(0.86) contrast(0.96);
+  min-height: 560px;
+  background: #dfeae4;
+  font-family: inherit;
 }
 
-.google-map-shell::after {
-  content: "";
+.map-loading {
   position: absolute;
   inset: 0;
-  pointer-events: none;
-  background: linear-gradient(180deg, rgba(238, 242, 239, 0.04), rgba(238, 242, 239, 0.1));
+  z-index: 500;
+  display: grid;
+  place-items: center;
+  color: #435d52;
+  font-size: 0.85rem;
+  font-weight: 750;
+  background: rgba(239, 246, 242, 0.88);
 }
 
-.map-marker {
-  position: absolute;
-  z-index: 2;
-  transform: translate(-50%, -50%);
-  width: 74px;
-  min-height: 46px;
+.map-error {
+  color: #8d2f19;
+  background: rgba(253, 232, 228, 0.94);
+}
+
+.province-marker-host {
+  background: transparent;
+  border: 0;
+}
+
+.province-count-marker {
+  width: 68px;
+  min-height: 42px;
   border: 1px solid rgba(28, 67, 53, 0.18);
   border-radius: 999px;
-  padding: 6px 8px;
+  padding: 5px 8px;
   color: #12231b;
   text-align: left;
-  box-shadow: 0 10px 18px rgba(18, 37, 29, 0.18);
+  cursor: pointer;
+  box-shadow: 0 7px 14px rgba(18, 37, 29, 0.2);
+  transition: box-shadow 140ms ease, transform 140ms ease;
 }
 
-.map-marker span,
-.map-marker strong {
+.province-count-marker span,
+.province-count-marker strong {
   display: block;
 }
 
-.map-marker span {
+.province-count-marker span {
   overflow: hidden;
-  font-size: 0.64rem;
+  font-size: 0.58rem;
   font-weight: 850;
   line-height: 1.05;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.map-marker strong {
+.province-count-marker strong {
   margin-top: 2px;
-  font-size: 1.12rem;
+  font-size: 1rem;
   line-height: 1;
 }
 
-.map-marker:hover {
-  outline: 2px solid rgba(25, 63, 50, 0.24);
+.province-count-marker:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 9px 18px rgba(18, 37, 29, 0.28);
+}
+
+.province-map-tooltip {
+  border: 1px solid #bfd0c7;
+  border-radius: 4px;
+  color: #173128;
+  box-shadow: 0 5px 14px rgba(18, 37, 29, 0.16);
+}
+
+.leaflet-container {
+  z-index: 0;
+}
+
+.leaflet-control-zoom a {
+  color: #173128;
+}
+
+.leaflet-control-attribution {
+  font-size: 0.62rem;
 }
 
 .zambia-map {
@@ -1078,18 +1109,22 @@ td strong {
     min-height: 640px;
   }
 
-  .map-marker {
-    width: 66px;
-    min-height: 42px;
-    padding: 5px 7px;
+  .interactive-province-map {
+    min-height: 640px;
   }
 
-  .map-marker span {
-    font-size: 0.58rem;
+  .province-count-marker {
+    width: 60px;
+    min-height: 38px;
+    padding: 5px 6px;
   }
 
-  .map-marker strong {
-    font-size: 1rem;
+  .province-count-marker span {
+    font-size: 0.52rem;
+  }
+
+  .province-count-marker strong {
+    font-size: 0.92rem;
   }
 
   .north-western,
